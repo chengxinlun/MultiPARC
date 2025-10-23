@@ -12,7 +12,7 @@ class FiniteDifferenceGrad(nn.Module):
         right_bottom=True,
         custom_padding=PaddingAll("reflect", 0),
     ):
-            """
+        """
         Module for calculation of gradient with finite difference filter.
     
         Args:

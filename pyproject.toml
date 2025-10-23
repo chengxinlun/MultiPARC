@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "multiparc"
+version = "0.1.0"
+description = "Physics-aware recurrent convolutional neural network: baseline and variants"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Xinlun Cheng", email = "xc7ts@virginia.edu" }]
+dependencies = [
+    "torch>=2.4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/chengxinlun/MultiPARC"
+Issues = "https://github.com/chengxinlun/MultiPARC/issues"
+
+[tool.hatch.build]
+packages = ["src/multiparc"]

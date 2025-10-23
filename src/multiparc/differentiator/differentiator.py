@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from multiparc.differenitator.mappingandrecon import MappingAndRecon, MRMAR, MRMARNoSpade
+from multiparc.differentiator.mappingandrecon import MappingAndRecon, MRMAR, MRMARNoSpade
 from multiparc.utility.resnet import ResNet
 from multiparc.utility.multires import _updown_mode_dict
 
@@ -157,7 +157,7 @@ class ADRDifferentiator(nn.Module):
         return t_dot
     
     
-class MGChannelDifferentiator(nn.Module):
+class MRChannelDifferentiator(nn.Module):
     def __init__(
         self,
         adv_idx,
@@ -186,10 +186,10 @@ class MGChannelDifferentiator(nn.Module):
         # MAR
         if self.n_explicit_features == 0:
             # No explicit features: normalize the feature channels and send it to a resnet regressor
-            self.mar = MGMARNoSpade(n_feature_channels_lists, self.n_explicit_features, n_out_channels, **mar_nospade_args)
+            self.mar = MRMARNoSpade(n_feature_channels_lists, self.n_explicit_features, n_out_channels, **mar_nospade_args)
         else:
             # With explicit features: use SPADE and sent it to a resnet regressor
-            self.mar = MGMAR(
+            self.mar = MRMAR(
                 n_feature_channels_lists, self.n_explicit_features, n_out_channels, **mar_spade_args
             )
 
@@ -211,7 +211,7 @@ class MGChannelDifferentiator(nn.Module):
         return out    
 
     
-class MGADRDifferentiator(nn.Module):
+class MRADRDifferentiator(nn.Module):
     def __init__(
         self,
         n_fe_features_list,
@@ -262,7 +262,7 @@ class MGADRDifferentiator(nn.Module):
                 adv_idx = in_instruction.get("a", [])
                 dif_idx = in_instruction.get("d", [])
                 self.modules_list.append(
-                    MGChannelDifferentiator(
+                    MRChannelDifferentiator(
                         torch.tensor(adv_idx, dtype=int).to(device),
                         torch.tensor(dif_idx, dtype=int).to(device),
                         n_fe_features_list,
@@ -286,16 +286,16 @@ class MGADRDifferentiator(nn.Module):
             t_dot: 4-d tensor of Float with the same shape as ```current```, the predicted temporal deriviatives for all channels
         """
         # Get the multi-grid
-        mg_current = [current]
+        mr_current = [current]
         for _ in range(1, self.n_scales):
-            mg_current.append(self.downsampler(mg_current[-1]))
+            mr_current.append(self.downsampler(mr_current[-1]))
         # Feature extraction
-        dynamic_features = self.feature_extraction(mg_current)
+        dynamic_features = self.feature_extraction(mr_current)
         # Temporal deriviative
         t_dot = torch.zeros_like(current)
         for each_out, each_module in zip(self.out_idx, self.modules_list):
             if each_module is not None:
-                t_dot_channel = each_module(mg_current, dynamic_features)
+                t_dot_channel = each_module(mr_current, dynamic_features)
                 # Replace the channels with each_out
                 for i, idx in enumerate(each_out):
                     t_dot[:, idx, :, :] = t_dot_channel[:, i, :, :]

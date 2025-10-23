@@ -113,7 +113,7 @@ class MappingAndRecon(nn.Module):
         return conv_out
 
     
-class MGMAR(nn.Module):
+class MRMAR(nn.Module):
     '''
     Multigrid Mapping and Reconstruction
     '''
@@ -159,7 +159,7 @@ class MGMAR(nn.Module):
                           for each_scale in n_base_features_lists]
         self.spade = nn.ModuleList(all_the_spades)
 
-        self.resnet = MGResNet(n_in_list=n_base_features_lists, 
+        self.resnet = MRResNet(n_in_list=n_base_features_lists, 
             n_hidden_list=[n_base_features_lists,] * resnet_n_blocks,
             sampling_factor=sampling_factor, 
             updown_mode=updown_mode,
@@ -172,7 +172,7 @@ class MGMAR(nn.Module):
         # Combine all the scales
         scale_combine = []
         for i in range(self.n_scales, 1, -1):
-            scale_combine.append(MGConv2d(n_base_features_lists[:i], n_base_features_lists[:i-1], resnet_kernel_size, sampling_factor, updown_mode, custom_padding))
+            scale_combine.append(MRConv2d(n_base_features_lists[:i], n_base_features_lists[:i-1], resnet_kernel_size, sampling_factor, updown_mode, custom_padding))
         self.scale_combine = nn.Sequential(*scale_combine)
         self.final_conv = nn.Conv2d(n_base_features_lists[0], n_out_channel, 1)
 
@@ -186,7 +186,7 @@ class MGMAR(nn.Module):
         return conv_out
 
 
-class MGMARNoSpade(nn.Module):
+class MRMARNoSpade(nn.Module):
     def __init__(self, 
                  n_base_features_lists: list[int], 
                  n_mask_channel: int, 
@@ -204,7 +204,7 @@ class MGMARNoSpade(nn.Module):
                  custom_padding=PaddingAll("reflect", 0),):
         all_the_norms = [nn.InstanceNorm2d(each_scale, **instancenorm_args) for each_scale in n_base_features_lists]
         self.norm = nn.ModuleList(all_the_norms)
-        self.resnet = MGResNet(n_in_list=n_base_features_lists, 
+        self.resnet = MRResNet(n_in_list=n_base_features_lists, 
             n_hidden_lists=[n_base_features_lists,] * resnet_n_blocks,
             sampling_factor=sampling_factory, 
             updown_mode=updown_mode,
@@ -217,7 +217,7 @@ class MGMARNoSpade(nn.Module):
         # Combine all the scales
         scale_combine = []
         for i in range(self.n_scales, 1, -1):
-            scale_combine.append(MGConv2d(n_base_features_lists[:i], n_base_features_lists[:i-1], resnet_kernel_size, sampling_factor, updown_mode, custom_padding))
+            scale_combine.append(MRConv2d(n_base_features_lists[:i], n_base_features_lists[:i-1], resnet_kernel_size, sampling_factor, updown_mode, custom_padding))
         self.scale_combine = nn.Sequential(*scale_combine)
         self.final_conv = nn.Conv2d(n_base_features_lists[0], n_out_channel, 1)
     
