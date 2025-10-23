@@ -19,8 +19,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install build tools
+      - name: Upgrade pip
         run: pip install --upgrade pip
+      
+      - name: Install build tools
         run: pip install hatch hatch-vcs
 
       - name: Build package
