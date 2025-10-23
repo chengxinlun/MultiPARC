@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"   # triggers on tags like v0.1.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Upgrade pip
+        run: pip install --upgrade pip
+
+      - name: Install Hatch + plugin
+        run: pip install hatch hatch-vcs
+
+      - name: Install project dependencies
+        run: hatch install
+
+      - name: Build package
+        run: hatch build
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
