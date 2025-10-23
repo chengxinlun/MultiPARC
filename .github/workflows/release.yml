@@ -25,9 +25,6 @@ jobs:
       - name: Install Hatch + plugin
         run: pip install hatch hatch-vcs
 
-      - name: Install project dependencies
-        run: hatch install
-
       - name: Build package
         run: hatch build
 
