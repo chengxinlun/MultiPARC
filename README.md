@@ -26,3 +26,4 @@ If you use PARCv2 or any of the model variants provided in this repository, plea
   year={2024}
 }
 ```
+#### Multi-resolution PARCv2
