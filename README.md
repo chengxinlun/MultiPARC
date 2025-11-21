@@ -10,6 +10,9 @@ pip install multiparc-<version>-py3-none-any.whl
 ```
 Replace ```<version>``` with the version of package downloaded.
 
+### Tutorial Notebooks
+[](https://github.com/chengxinlun/mrparcv2)
+
 ### Variants included
 * PARCv2
 * Multi-resolution PARCv2
