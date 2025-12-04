@@ -11,7 +11,7 @@ pip install multiparc-<version>-py3-none-any.whl
 Replace ```<version>``` with the version of package downloaded.
 
 ### Tutorial Notebooks
-[](https://github.com/chengxinlun/parcv2_trl2d)
+[PARCv2 and MRPARCv2](https://github.com/chengxinlun/parcv2_trl2d)
 
 ### Variants included
 * PARCv2
