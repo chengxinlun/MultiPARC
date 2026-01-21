@@ -118,6 +118,7 @@ class SPADEGeneratorUnit(nn.Module):
         activation: nn.Module = nn.LeakyReLU,
         activation_args: dict = {"negative_slope": 0.2},
         noise_std: float = 0.05,
+        skip_spade: bool = False,
         spade_kernel_size: int = 3,
         spade_activation: nn.Module = nn.ReLU,
         spade_activation_args: dict = {},
@@ -166,10 +167,22 @@ class SPADEGeneratorUnit(nn.Module):
             padding=0,
         )
         # Skip connection
-        if in_channels == out_channels:
+        if (in_channels == out_channels) and (not skip_spade):
             self.learned_skip = False
             self.skip_spade = None
             self.skip_conv = None
+        elif (in_channels == out_channels) and skip_spade:
+            self.learned_skip = True
+            self.skip_spade = SPADE(
+                in_channels,
+                mask_channels,
+                spade_kernel_size,
+                spade_activation,
+                spade_activation_args,
+                spade_eps,
+                custom_padding,
+            )
+            self.skip_conv = nn.Identity()
         else:
             self.learned_skip = True
             self.skip_spade = SPADE(
