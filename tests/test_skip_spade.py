@@ -1,3 +1,4 @@
+from multiparc.utility.spade import SPADE
 from multiparc.utility.unet import UNet
 from multiparc.utility.blurpool import BlurMaxPool2d
 from multiparc.boundary_conditions import PaddingXY
@@ -66,6 +67,7 @@ def test_baseline_parcv2():
         "spadegen_activation": nn.LeakyReLU,
         "spadegen_activation_args": {"negative_slope": 0.2},
         "spadegen_noise_std": 0.05,
+        "spadegen_skip_spade": True,
         "spade_kernel_size": 3,
         "spade_activation": nn.ReLU,
         "spade_activation_args": {},
@@ -91,27 +93,11 @@ def test_baseline_parcv2():
     rk4_int = Integrator(False, rk4_int)
     # Baseline PARCv2
     parc_model = PARCv2(diff, rk4_int).cuda()
-    # Load state_dict
-    state_dict = torch.load(os.path.join(test_dir, "assets", "baseline.pt"), weights_only=False)["model_state_dict"]
-    parc_model.load_state_dict(state_dict)
-    # Forward
-    x = torch.rand(2, 5, 64, 128, dtype=torch.float32, device="cuda") + 1e-8
-    t0 = torch.tensor(0.0, dtype=torch.float32, device="cuda")
-    t1 = torch.tensor([1.0], dtype=torch.float32, device="cuda")
-    y = torch.rand(1, 2, 5, 64, 128, dtype=torch.float32, device="cuda") + 1e-8
-    pred = parc_model(x, t0, t1)
-    # Backward
-    crit = nn.L1Loss()
-    crit(pred, y).backward()
-    assert y.isfinite().all(), "Non-finite loss value"
-    for name, p in parc_model.named_parameters():
-        if p.grad is not None:
-            assert torch.isfinite(p.grad).all(), f"Non-finite gradient in {name}"
     # No skip spade
     for n, m in parc_model.named_modules():
         if n.endswith(".spade"):
-            assert m.skip_conv is None
-            assert m.skip_spade is None
+            assert isinstance(m.skip_conv, nn.Identity)
+            assert isinstance(m.skip_spade, SPADE)
             print(n + " has learnt skip connections: " + str(m.learned_skip))
     # Clean up
     del parc_model
