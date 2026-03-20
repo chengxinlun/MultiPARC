@@ -1,6 +1,5 @@
 from multiparc.utility.spade import SPADE
 from multiparc.utility.unet import UNet
-from multiparc.utility.blurpool import BlurMaxPool2d
 from multiparc.boundary_conditions import PaddingXY
 from multiparc.differentiator.finitedifference import FiniteDifferenceGrad
 from multiparc.differentiator.advection import AdvectionUpwind
@@ -12,8 +11,6 @@ from multiparc.PARCv2 import PARCv2
 
 import torch
 import torch.nn as nn
-from pathlib import Path
-import os
 import random
 
 
@@ -23,7 +20,6 @@ def test_baseline_parcv2():
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
     torch.use_deterministic_algorithms(True)
-    test_dir = Path(__file__).parent
     bce = PaddingXY(["circular", "reflect"], [0.0, 0.0])
     depth_ratio = 1.54
     unet = UNet(

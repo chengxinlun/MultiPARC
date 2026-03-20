@@ -9,13 +9,13 @@ class Integrator(nn.Module):
         num_int: nn.Module,
         **kwarg,
     ):
-        '''
+        """
         Constructor of integrator
 
         Args:
             clip: bool, whether to clip value or not. Note that clip occurs before the numerical integrator call
             numerical_integrator: nn.module, numerical integrator. Forward function must have the following signature: ```(f, t0, current, delta_t)```, where ```f``` is the differentiator, ```t0``` is current time, ```current``` is current state, ```delta_t``` is time step.
-        '''
+        """
         super(Integrator, self).__init__(**kwarg)
         self.clip = clip
         self.numerical_integrator = num_int
@@ -34,8 +34,6 @@ class Integrator(nn.Module):
             res: torch.tensor of shape (ts, b, c, y, x), the predicted state and velocity variables at each time in t1
         """
         all_time = torch.cat([t0.unsqueeze(0), t1])
-        n_channel = ic.shape[1]
-        n_state_var = n_channel - 2
         res = []
         current = ic
         for ts in range(1, all_time.shape[0]):

@@ -1,5 +1,4 @@
 from multiparc.utility.unet import UNet
-from multiparc.utility.blurpool import BlurMaxPool2d
 from multiparc.boundary_conditions import PaddingXY
 from multiparc.differentiator.finitedifference import FiniteDifferenceGrad
 from multiparc.differentiator.advection import AdvectionUpwind
@@ -92,7 +91,9 @@ def test_baseline_parcv2():
     # Baseline PARCv2
     parc_model = PARCv2(diff, rk4_int).cuda()
     # Load state_dict
-    state_dict = torch.load(os.path.join(test_dir, "assets", "baseline.pt"), weights_only=False)["model_state_dict"]
+    state_dict = torch.load(
+        os.path.join(test_dir, "assets", "baseline.pt"), weights_only=False
+    )["model_state_dict"]
     parc_model.load_state_dict(state_dict)
     # Forward
     x = torch.rand(2, 5, 64, 128, dtype=torch.float32, device="cuda") + 1e-8

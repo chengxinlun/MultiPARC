@@ -1,6 +1,10 @@
 import torch
 import torch.nn as nn
-from multiparc.differentiator.mappingandrecon import MappingAndRecon, MRMAR, MRMARNoSpade
+from multiparc.differentiator.mappingandrecon import (
+    MappingAndRecon,
+    MRMAR,
+    MRMARNoSpade,
+)
 from multiparc.utility.resnet import ResNet
 from multiparc.utility.multires import _updown_mode_dict
 
@@ -88,9 +92,9 @@ class ADRDifferentiator(nn.Module):
         mar_args,
         device="cuda",
     ):
-        '''
+        """
         Advection-Diffusion-Reaction differentiator
-    
+
         Args:
             n_fe_features: int. Number of output features from feature extractor network
             channel_instructions: dict. Governs how the implicit and explicit features are combined, which explicit features to include and which channel(s) to output to. See tutorial for details.
@@ -99,7 +103,7 @@ class ADRDifferentiator(nn.Module):
             diffusion: nn.Module. Module for calculating diffusion. Signature of forward function must follow ```differentiator.diffusion.Diffusion```.
             mar_args: dict, arguments to pass to the constructor of modules for combinining implicit and explicit features.
             device: str, optional, default ```cuda```. Device where the models stay.
-        '''
+        """
         super().__init__()
         self.feature_extraction = feature_extraction
         # Parsing the channel instructions
@@ -155,8 +159,8 @@ class ADRDifferentiator(nn.Module):
                 for i, idx in enumerate(each_out):
                     t_dot[:, idx, :, :] = t_dot_channel[:, i, :, :]
         return t_dot
-    
-    
+
+
 class MRChannelDifferentiator(nn.Module):
     def __init__(
         self,
@@ -186,11 +190,19 @@ class MRChannelDifferentiator(nn.Module):
         # MAR
         if self.n_explicit_features == 0:
             # No explicit features: normalize the feature channels and send it to a resnet regressor
-            self.mar = MRMARNoSpade(n_feature_channels_lists, self.n_explicit_features, n_out_channels, **mar_nospade_args)
+            self.mar = MRMARNoSpade(
+                n_feature_channels_lists,
+                self.n_explicit_features,
+                n_out_channels,
+                **mar_no_spade_args,
+            )
         else:
             # With explicit features: use SPADE and sent it to a resnet regressor
             self.mar = MRMAR(
-                n_feature_channels_lists, self.n_explicit_features, n_out_channels, **mar_spade_args
+                n_feature_channels_lists,
+                self.n_explicit_features,
+                n_out_channels,
+                **mar_spade_args,
             )
 
     def forward(self, x, features):
@@ -201,16 +213,19 @@ class MRChannelDifferentiator(nn.Module):
             ef_scale = []
             if self.adv_idx.nelement() != 0:
                 ef_scale.append(
-                    self.adv(torch.index_select(each_x, 1, self.adv_idx), each_x[:, -2:, :, :])
+                    self.adv(
+                        torch.index_select(each_x, 1, self.adv_idx),
+                        each_x[:, -2:, :, :],
+                    )
                 )
             if self.dif_idx.nelement() != 0:
                 ef_scale.append(self.dif(torch.index_select(each_x, 1, self.dif_idx)))
             explicit_features.append(torch.cat(ef_scale, dim=1))
         # Recombine
         out = self.mar(features, explicit_features)
-        return out    
+        return out
 
-    
+
 class MRADRDifferentiator(nn.Module):
     def __init__(
         self,
@@ -223,9 +238,9 @@ class MRADRDifferentiator(nn.Module):
         mar_nospade_args,
         device="cuda",
     ):
-        '''
+        """
         Multi-resolution Advection-Diffusion-Reaction differentiator
-    
+
         Args:
             n_fe_features_list: list[int]. Number of output features from multi-resolution feature extractor network
             channel_instructions: dict. Governs how the implicit and explicit features are combined, which explicit features to include and which channel(s) to output to. See tutorial for details.
@@ -235,11 +250,13 @@ class MRADRDifferentiator(nn.Module):
             mar_spade_args: dict. Arguments to pass to the constructor of modules for combinining implicit and explicit features.
             mar_nospade_args: dict. Arguments to pass to the constructor of modules for with only implicit features.
             device: str, optional, default ```cuda```. Device where the models stay.
-        '''
+        """
         super().__init__()
         self.n_scales = len(n_fe_features_list)
         self.feature_extraction = feature_extraction
-        self.downsampler = _updown_mode_dict[mar_spade_args["updown_mode"]][0](mar_spade_args["sampling_factor"])
+        self.downsampler = _updown_mode_dict[mar_spade_args["updown_mode"]][0](
+            mar_spade_args["sampling_factor"]
+        )
         # Parsing the channel instructions
         self.out_idx = []
         self.modules_list = nn.ModuleList()
@@ -270,7 +287,7 @@ class MRADRDifferentiator(nn.Module):
                         advection,
                         diffusion,
                         mar_spade_args,
-                        mar_nospade_args
+                        mar_nospade_args,
                     )
                 )
 
