@@ -1,10 +1,10 @@
-import torch.nn as nn
+from torch import nn
 from torch.utils.checkpoint import checkpoint
 
 
 class RK4(nn.Module):
     def __init__(self, use_checkpoint, **kwarg):
-        super(RK4, self).__init__(**kwarg)
+        super().__init__(**kwarg)
         self.use_checkpoint = use_checkpoint
 
     def forward(self, f, t, current, step_size):

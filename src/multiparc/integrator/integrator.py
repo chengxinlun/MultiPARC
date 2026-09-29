@@ -1,5 +1,5 @@
 import torch
-import torch.nn as nn
+from torch import nn
 
 
 class Integrator(nn.Module):
@@ -16,7 +16,7 @@ class Integrator(nn.Module):
             clip: bool, whether to clip value or not. Note that clip occurs before the numerical integrator call
             numerical_integrator: nn.module, numerical integrator. Forward function must have the following signature: ```(f, t0, current, delta_t)```, where ```f``` is the differentiator, ```t0``` is current time, ```current``` is current state, ```delta_t``` is time step.
         '''
-        super(Integrator, self).__init__(**kwarg)
+        super().__init__(**kwarg)
         self.clip = clip
         self.numerical_integrator = num_int
 

@@ -1,4 +1,4 @@
-import torch.nn as nn
+from torch import nn
 
 
 class PARCv2(nn.Module):
@@ -11,7 +11,7 @@ class PARCv2(nn.Module):
             integrator: nn.Module, the numerical and data-driven (if necessary) integrator
             **kwargs: other parameters that will be passed onto torch.nn.Module
         """
-        super(PARCv2, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.differentiator = differentiator
         self.integrator = integrator

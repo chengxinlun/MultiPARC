@@ -1,6 +1,5 @@
 import torch
-import torch.nn as nn
-
+from torch import nn
 
 _updown_mode_dict = {
     "avg-bilinear": [nn.AvgPool2d, "bilinear"],

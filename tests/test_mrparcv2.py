@@ -1,18 +1,19 @@
-from multiparc.utility.multires import MRResNet
-from multiparc.boundary_conditions import PaddingXY
-from multiparc.differentiator.finitedifference import FiniteDifferenceGrad
-from multiparc.differentiator.advection import AdvectionUpwind
-from multiparc.differentiator.diffusion import Diffusion
-from multiparc.differentiator.differentiator import MRADRDifferentiator
-from multiparc.integrator.rk4 import RK4
-from multiparc.integrator.integrator import Integrator
-from multiparc.PARCv2 import PARCv2
-
-import torch
-import torch.nn as nn
-from pathlib import Path
 import os
 import random
+from pathlib import Path
+
+import torch
+from torch import nn
+
+from multiparc.boundary_conditions import PaddingXY
+from multiparc.differentiator.advection import AdvectionUpwind
+from multiparc.differentiator.differentiator import MRADRDifferentiator
+from multiparc.differentiator.diffusion import Diffusion
+from multiparc.differentiator.finitedifference import FiniteDifferenceGrad
+from multiparc.integrator.integrator import Integrator
+from multiparc.integrator.rk4 import RK4
+from multiparc.PARCv2 import PARCv2
+from multiparc.utility.multires import MRResNet
 
 
 def test_baseline_parcv2():

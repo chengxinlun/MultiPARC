@@ -1,8 +1,9 @@
-import torch.nn as nn
-from multiparc.utility.spade import SPADEGeneratorUnit
-from multiparc.utility.resnet import ResNet
+from torch import nn
+
 from multiparc.boundary_conditions import PaddingAll
-from multiparc.utility.multires import MRResNet, MRConv2d
+from multiparc.utility.multires import MRConv2d, MRResNet
+from multiparc.utility.resnet import ResNet
+from multiparc.utility.spade import SPADEGeneratorUnit
 
 
 class MappingAndRecon(nn.Module):
@@ -53,7 +54,7 @@ class MappingAndRecon(nn.Module):
         resnet_activation_args: dict, optional, default ```{}```. Arguments to pass to the constructor of ```resnet_activation```.
         custom_padding: nn.Module, optional, default ```PaddingAll("reflect", 0)```. Custom padding module for enforcement of boundary conditions.
         '''
-        super(MappingAndRecon, self).__init__()
+        super().__init__()
         self.add_noise = add_noise
 
         # Initialize SPADE generator unit

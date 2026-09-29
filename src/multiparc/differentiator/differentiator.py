@@ -1,8 +1,13 @@
 import torch
-import torch.nn as nn
-from multiparc.differentiator.mappingandrecon import MappingAndRecon, MRMAR, MRMARNoSpade
-from multiparc.utility.resnet import ResNet
+from torch import nn
+
+from multiparc.differentiator.mappingandrecon import (
+    MRMAR,
+    MappingAndRecon,
+    MRMARNoSpade,
+)
 from multiparc.utility.multires import _updown_mode_dict
+from multiparc.utility.resnet import ResNet
 
 
 class ChannelDifferentiator(nn.Module):
@@ -112,7 +117,7 @@ class ADRDifferentiator(nn.Module):
             else:
                 out_channels = 1
                 self.out_idx.append((each_out,))
-            if ("c" in in_instruction) and (in_instruction["c"]):
+            if in_instruction.get("c"):
                 # Case 1: constant channel
                 self.modules_list.append(None)
             else:
@@ -250,7 +255,7 @@ class MRADRDifferentiator(nn.Module):
             else:
                 out_channels = 1
                 self.out_idx.append((each_out,))
-            if ("c" in in_instruction) and (in_instruction["c"]):
+            if in_instruction.get("c"):
                 # Case 1: constant channel
                 self.modules_list.append(None)
             else:

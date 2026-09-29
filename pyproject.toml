@@ -12,6 +12,8 @@ license = { file = "LICENSE" }
 authors = [{ name = "Xinlun Cheng", email = "xc7ts@virginia.edu" }]
 dependencies = [
     "torch>=2.4.0",
+    "scikit-learn",
+    "scipy"
 ]
 
 [project.urls]
