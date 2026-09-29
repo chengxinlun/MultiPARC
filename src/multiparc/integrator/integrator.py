@@ -7,18 +7,26 @@ class Integrator(nn.Module):
         self,
         clip: bool,
         num_int: nn.Module,
-        **kwarg,
+        clip_min: float = 0.0,
+        clip_max: float = 1.0,
+        detach_intermediate: bool = False,
     ):
         """
         Constructor of integrator
 
         Args:
             clip: bool, whether to clip value or not. Note that clip occurs before the numerical integrator call
-            numerical_integrator: nn.module, numerical integrator. Forward function must have the following signature: ```(f, t0, current, delta_t)```, where ```f``` is the differentiator, ```t0``` is current time, ```current``` is current state, ```delta_t``` is time step.
+            num_int: nn.module, numerical integrator. Forward function must have the following signature: ```(f, t0, current, delta_t)```, where ```f``` is the differentiator, ```t0``` is current time, ```current``` is current state, ```delta_t``` is time step.
+            clip_min: float, optional, default 0.0. Minimal value of the clip function.
+            clip_max: float, optional, default 1.0. Maximal value of the clip function.
+            detach_intermediate: bool, optional, default False. Whether to detach the intermediate states between integrator stepping.
         """
-        super().__init__(**kwarg)
+        super().__init__()
         self.clip = clip
         self.numerical_integrator = num_int
+        self.clip_min = clip_min
+        self.clip_max = clip_max
+        self.detach_intermediate = detach_intermediate
 
     def forward(self, f, ic, t0, t1):
         """
@@ -34,11 +42,15 @@ class Integrator(nn.Module):
             res: torch.tensor of shape (ts, b, c, y, x), the predicted state and velocity variables at each time in t1
         """
         all_time = torch.cat([t0.unsqueeze(0), t1])
+        n_channel = ic.shape[1]
+        n_state_var = n_channel - 2
         res = []
         current = ic
         for ts in range(1, all_time.shape[0]):
             if self.clip:
-                current = torch.clamp(current, 0.0, 1.0)
+                current = torch.clamp(current, self.clip_min, self.clip_max)
+            if self.detach_intermediate:
+                current = current.detach()
             # Numerical integrator
             current, update = self.numerical_integrator(
                 f, all_time[ts - 1], current, all_time[ts] - all_time[ts - 1]

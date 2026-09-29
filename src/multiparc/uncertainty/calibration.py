@@ -7,7 +7,9 @@ from scipy import stats
 from sklearn.isotonic import IsotonicRegression
 
 
-def cumulative_mc_stats_welford(file_dir, expected_shape, pattern="*.pt", sort_key=None, track_scalar="mean_std"):
+def cumulative_mc_stats_welford(
+    file_dir, expected_shape, pattern="*.pt", sort_key=None, track_scalar="mean_std"
+):
     """
     Incrementally computes running mean/std over saved inference files,
     without ever stacking more than one sample in memory at a time.
@@ -52,9 +54,9 @@ def cumulative_mc_stats_welford(file_dir, expected_shape, pattern="*.pt", sort_k
         if k >= 2:
             running_std = torch.sqrt(M2 / (k - 1))
             if track_scalar == "mean_std":
-                scalar_curve.append(running_std.mean(dim=(0,2,3)))
+                scalar_curve.append(running_std.mean(dim=(0, 2, 3)))
             elif track_scalar == "max_std":
-                scalar_curve.append(running_std.max(dim=(0,2,3)))
+                scalar_curve.append(running_std.max(dim=(0, 2, 3)))
             n_samples.append(k)
 
         del x  # drop reference so it can be freed before next file loads
@@ -67,7 +69,7 @@ def fit_isotonic_calibrator(abs_error, std, z_grid=None, eps=1e-12):
     """
     Fits a post-hoc calibrator mapping empirical coverage to the z-score
     that actually achieves it, using MC dropout std as the uncertainty proxy.
-    
+
     For a dense grid of z-values (0.001 to 6.0 by default, spanning near-zero
     to near-full coverage), computes empirical coverage (fraction of points
     with abs_error <= z * std), then fits an isotonic regression from
@@ -88,7 +90,7 @@ def fit_isotonic_calibrator(abs_error, std, z_grid=None, eps=1e-12):
         z_grid: z-values to evaluate coverage at for fitting. Widen the
             upper bound if coverage doesn't approach 1.0 by 6.0 for your data.
         eps: floor applied to std to avoid division by zero.
-    
+
     Returns:
         Fitted sklearn.isotonic.IsotonicRegression mapping coverage -> z.
     """
@@ -116,14 +118,18 @@ def make_multiplier_fn(inverse):
     Returns:
         Callable that maps probability to the multipiler for uncertainty calibration
     """
+
     def multiplier(p):
         z_p = stats.norm.ppf((1 + p) / 2)
         z_actual_needed = inverse.predict([p])[0]
         return z_actual_needed / z_p
+
     return multiplier
 
 
-def compute_coverage_curve(abs_error, std, confidence_levels=None, multiplier_fn=None, eps=1e-12):
+def compute_coverage_curve(
+    abs_error, std, confidence_levels=None, multiplier_fn=None, eps=1e-12
+):
     """
     Computes empirical coverage at each nominal confidence level.
 
@@ -154,7 +160,11 @@ def compute_coverage_curve(abs_error, std, confidence_levels=None, multiplier_fn
     empirical_coverage = np.array(empirical_coverage)
     ece = np.mean(np.abs(empirical_coverage - confidence_levels))
 
-    return {"confidence_levels": confidence_levels, "empirical_coverage": empirical_coverage, "ece": ece}
+    return {
+        "confidence_levels": confidence_levels,
+        "empirical_coverage": empirical_coverage,
+        "ece": ece,
+    }
 
 
 def plot_reliability_diagram(results, label="MC dropout", ax=None):
@@ -193,8 +203,13 @@ def plot_reliability_diagram(results, label="MC dropout", ax=None):
         results = [(results, label)]
 
     for res, lbl in results:
-        ax.plot(res["confidence_levels"], res["empirical_coverage"], marker="o",
-                markersize=4, label=f"{lbl} (ECE={res['ece']:.4f})")
+        ax.plot(
+            res["confidence_levels"],
+            res["empirical_coverage"],
+            marker="o",
+            markersize=4,
+            label=f"{lbl} (ECE={res['ece']:.4f})",
+        )
 
     ax.set_xlabel("Nominal confidence level")
     ax.set_ylabel("Empirical coverage")

@@ -2,9 +2,8 @@ import torch
 import torch.nn.functional as F
 
 
-def add_mc_dropout_hooks(model, p=0.1, layer_types=(torch.nn.Conv2d),
-                         exclude_names=()):
-    '''
+def add_mc_dropout_hooks(model, p=0.1, layer_types=(torch.nn.Conv2d), exclude_names=()):
+    """
     Registers forward hooks that inject MC dropout on the output of matching
     layers, without modifying the model's definition.
 
@@ -26,7 +25,7 @@ def add_mc_dropout_hooks(model, p=0.1, layer_types=(torch.nn.Conv2d),
     Returns:
         List of hook handles. Call handle.remove() on each to restore the
         model's original deterministic behavior.
-    '''
+    """
     handles = []
 
     def make_hook(is_conv):
@@ -35,6 +34,7 @@ def add_mc_dropout_hooks(model, p=0.1, layer_types=(torch.nn.Conv2d),
                 return F.dropout2d(output, p=p, training=True)
             else:
                 return F.dropout(output, p=p, training=True)
+
         return hook
 
     for name, module in model.named_modules():
