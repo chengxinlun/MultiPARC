@@ -1,5 +1,4 @@
 import random
-from pathlib import Path
 
 import torch
 from torch import nn
@@ -22,7 +21,6 @@ def test_baseline_parcv2():
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
     torch.use_deterministic_algorithms(True)
-    test_dir = Path(__file__).parent
     bce = PaddingXY(["circular", "reflect"], [0.0, 0.0])
     depth_ratio = 1.54
     unet = UNet(

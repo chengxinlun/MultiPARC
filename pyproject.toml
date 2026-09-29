@@ -20,6 +20,9 @@ dependencies = [
 Homepage = "https://github.com/chengxinlun/MultiPARC"
 Issues = "https://github.com/chengxinlun/MultiPARC/issues"
 
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+
 [tool.hatch.build]
 packages = ["src/multiparc"]
 

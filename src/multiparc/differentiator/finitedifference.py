@@ -15,7 +15,7 @@ class FiniteDifferenceGrad(nn.Module):
     ):
         """
         Module for calculation of gradient with finite difference filter.
-    
+
         Args:
             filter_1d: torch.tensor, optional, default ```[-1.0, 1.0]```. 1D finite difference filter for gradient calculation. Default value is one-sided only
             device: str, optional, default ```cuda```. The device to store the filters in.
@@ -55,7 +55,7 @@ class FiniteDifferenceGrad(nn.Module):
         )  # [1, 1, 1, filter_size]
 
     def forward(self, x):
-        """ 
+        """
         Forward pass.
 
         Args:
