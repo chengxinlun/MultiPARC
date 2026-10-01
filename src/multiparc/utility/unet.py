@@ -1,6 +1,6 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
 
 class UNetDownBlock(nn.Module):
@@ -37,7 +37,7 @@ class UNetDownBlock(nn.Module):
         pooling_args,
         custom_padding,
     ):
-        super(UNetDownBlock, self).__init__()
+        super().__init__()
         # Padding
         self.padding = custom_padding
         self.padding_instruction = [
@@ -104,7 +104,7 @@ class UNetUpBlock(nn.Module):
         activation_args,
         custom_padding,
     ):
-        super(UNetUpBlock, self).__init__()
+        super().__init__()
         # Upsampling
         self.upConv = nn.Upsample(scale_factor=2, mode="bilinear")
         # Padding
@@ -177,7 +177,7 @@ class UNet(nn.Module):
         pooling_args={"kernel_size": 2},
         custom_padding=lambda x, pdi: F.pad(x, pdi, "reflect"),
     ):
-        super(UNet, self).__init__()
+        super().__init__()
         # Padding
         self.padding = custom_padding
         self.padding_instruction = [

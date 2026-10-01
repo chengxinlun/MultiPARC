@@ -1,18 +1,19 @@
-from multiparc.utility.multires import MRResNet
-from multiparc.boundary_conditions import PaddingXY
-from multiparc.differentiator.finitedifference import FiniteDifferenceGrad
-from multiparc.differentiator.advection import AdvectionUpwind
-from multiparc.differentiator.diffusion import Diffusion
-from multiparc.differentiator.differentiator import MRADRDifferentiator
-from multiparc.integrator.rk4 import RK4
-from multiparc.integrator.integrator import Integrator
-from multiparc.PARCv2 import PARCv2
-
-import torch
-import torch.nn as nn
-from pathlib import Path
 import os
 import random
+from pathlib import Path
+
+import torch
+from torch import nn
+
+from multiparc.boundary_conditions import PaddingXY
+from multiparc.differentiator.advection import AdvectionUpwind
+from multiparc.differentiator.differentiator import MRADRDifferentiator
+from multiparc.differentiator.diffusion import Diffusion
+from multiparc.differentiator.finitedifference import FiniteDifferenceGrad
+from multiparc.integrator.integrator import Integrator
+from multiparc.integrator.rk4 import RK4
+from multiparc.PARCv2 import PARCv2
+from multiparc.utility.multires import MRResNet
 
 
 def test_baseline_parcv2():
@@ -27,16 +28,25 @@ def test_baseline_parcv2():
     n_fe_features = 64
     n_blocks = 3
     unet = MRResNet(
-            [5,] * n_scales,
-            [[n_fe_features,] * n_scales] * n_blocks,
-            3,
-            2,
-            "avg-bilinear",
-            normalization=None,
-            normalization_args={},
-            activation=nn.ReLU,
-            activation_args={},
-            custom_padding=bce,
+        [
+            5,
+        ]
+        * n_scales,
+        [
+            [
+                n_fe_features,
+            ]
+            * n_scales
+        ]
+        * n_blocks,
+        3,
+        2,
+        "avg-bilinear",
+        normalization=None,
+        normalization_args={},
+        activation=nn.ReLU,
+        activation_args={},
+        custom_padding=bce,
     ).cuda()
     # Numerical schemes
     grad_ldiff = FiniteDifferenceGrad(
@@ -79,14 +89,27 @@ def test_baseline_parcv2():
         (3, 4): {"a": [3, 4], "r": True},  # 3,4: Adv(3, 4) + Reaction
     }
     # Differentiator
-    diff = MRADRDifferentiator([n_fe_features,] * n_scales, channel_instructions, unet, adv, dif, mar_args, {}).cuda()
+    diff = MRADRDifferentiator(
+        [
+            n_fe_features,
+        ]
+        * n_scales,
+        channel_instructions,
+        unet,
+        adv,
+        dif,
+        mar_args,
+        {},
+    ).cuda()
     # Integrator
     rk4_int = RK4(use_checkpoint=False).cuda()
     rk4_int = Integrator(False, rk4_int)
     # MRPARCv2
     parc_model = PARCv2(diff, rk4_int).cuda()
-    state_dict = torch.load(os.path.join(test_dir, "assets", "mrparcv2.pt"), weights_only=False)["model_state_dict"]
-    state_dict = {k.replace('_orig_mod.', ''): state_dict[k] for k in state_dict.keys()}
+    state_dict = torch.load(
+        os.path.join(test_dir, "assets", "mrparcv2.pt"), weights_only=False
+    )["model_state_dict"]
+    state_dict = {k.replace("_orig_mod.", ""): state_dict[k] for k in state_dict.keys()}
     parc_model.load_state_dict(state_dict)
     # Forward
     x = torch.rand(2, 5, 64, 128, dtype=torch.float32, device="cuda")

@@ -1,7 +1,6 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-from typing import List
+from torch import nn
 
 
 class ResNetBlock(nn.Module):
@@ -34,7 +33,7 @@ class ResNetBlock(nn.Module):
         activation_args: dict,
         custom_padding: nn.Module,
     ):
-        super(ResNetBlock, self).__init__()
+        super().__init__()
         # Padding
         self.padding = custom_padding
         self.padding_instruction = [
@@ -99,7 +98,7 @@ class ResNet(nn.Module):
     def __init__(
         self,
         in_channels: int,
-        block_dimensions: List[int],
+        block_dimensions: list[int],
         kernel_size: int = 3,
         normalization: nn.Module = None,
         normalization_args: dict = {},
@@ -109,7 +108,7 @@ class ResNet(nn.Module):
         pooling_args: dict = {},
         custom_padding: nn.Module = lambda x, pdi: F.pad(x, pdi, "reflect"),
     ):
-        super(ResNet, self).__init__()
+        super().__init__()
         # Padding
         self.padding = custom_padding
         self.padding_instruction = [

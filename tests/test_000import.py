@@ -1,9 +1,9 @@
 import importlib
-import pkgutil
 import pathlib
+import pkgutil
 import sys
-import pytest
 
+import pytest
 
 PACKAGE_NAME = "multiparc"
 

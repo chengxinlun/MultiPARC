@@ -1,19 +1,19 @@
-from multiparc.utility.unet import UNet
-from multiparc.utility.blurpool import BlurMaxPool2d
-from multiparc.boundary_conditions import PaddingXY
-from multiparc.differentiator.finitedifference import FiniteDifferenceGrad
-from multiparc.differentiator.advection import AdvectionUpwind
-from multiparc.differentiator.diffusion import Diffusion
-from multiparc.differentiator.differentiator import ADRDifferentiator
-from multiparc.integrator.rk4 import RK4
-from multiparc.integrator.integrator import Integrator
-from multiparc.PARCv2 import PARCv2
-
-import torch
-import torch.nn as nn
-from pathlib import Path
 import os
 import random
+from pathlib import Path
+
+import torch
+from torch import nn
+
+from multiparc.boundary_conditions import PaddingXY
+from multiparc.differentiator.advection import AdvectionUpwind
+from multiparc.differentiator.differentiator import ADRDifferentiator
+from multiparc.differentiator.diffusion import Diffusion
+from multiparc.differentiator.finitedifference import FiniteDifferenceGrad
+from multiparc.integrator.integrator import Integrator
+from multiparc.integrator.rk4 import RK4
+from multiparc.PARCv2 import PARCv2
+from multiparc.utility.unet import UNet
 
 
 def test_baseline_parcv2():
@@ -92,7 +92,9 @@ def test_baseline_parcv2():
     # Baseline PARCv2
     parc_model = PARCv2(diff, rk4_int).cuda()
     # Load state_dict
-    state_dict = torch.load(os.path.join(test_dir, "assets", "baseline.pt"), weights_only=False)["model_state_dict"]
+    state_dict = torch.load(
+        os.path.join(test_dir, "assets", "baseline.pt"), weights_only=False
+    )["model_state_dict"]
     parc_model.load_state_dict(state_dict)
     # Forward
     x = torch.rand(2, 5, 64, 128, dtype=torch.float32, device="cuda") + 1e-8

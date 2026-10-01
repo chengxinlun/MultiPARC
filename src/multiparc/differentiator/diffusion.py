@@ -1,6 +1,7 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
+
 from multiparc.boundary_conditions import PaddingAll
 
 
@@ -17,14 +18,14 @@ class Diffusion(nn.Module):
         device="cuda",
         custom_padding=PaddingAll("reflect", 0),
     ):
-        '''
+        """
         Constructor of differentiator.diffusion.Diffusion
 
         Args:
             filter_2d: 2d torch.tensor, optional, default ```[[0.0, 1.0, 0.0], [1.0, -4.0, 1.0], [0.0, 1.0, 0.0]]```. Finite difference filter that will be used to calculate advection.
             device: str, optional, default ```cuda```. Device where the tensors and modules will be stored.
             custom_padding: nn.Module, optional, default ```PaddingAll("reflect", 0)```. Custom padding module for boundary condition enforcement. Default values applies zero gradient on all boundaries.
-        '''
+        """
         super().__init__()
         self.padding = custom_padding
         # Determine padding for dy and dx based on filter size

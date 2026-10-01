@@ -1,5 +1,5 @@
 import torch
-import torch.nn as nn
+from torch import nn
 
 
 class Advection(nn.Module):
@@ -11,7 +11,7 @@ class Advection(nn.Module):
     """
 
     def __init__(self, finite_difference_method):
-        super(Advection, self).__init__()
+        super().__init__()
         self.cdiff = finite_difference_method
 
     def forward(self, state_variable, velocity_field):
@@ -42,7 +42,7 @@ class AdvectionUpwind(nn.Module):
     """
 
     def __init__(self, left_deriviative, right_deriviative):
-        super(AdvectionUpwind, self).__init__()
+        super().__init__()
         self.ldiff = left_deriviative
         self.rdiff = right_deriviative
 

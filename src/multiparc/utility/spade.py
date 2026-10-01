@@ -1,6 +1,6 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
 
 class SPADE(nn.Module):
@@ -30,7 +30,7 @@ class SPADE(nn.Module):
         eps: float,
         custom_padding: nn.Module,
     ):
-        super(SPADE, self).__init__()
+        super().__init__()
         # Padding
         self.padding = custom_padding
         self.padding_instruction = [
@@ -125,7 +125,7 @@ class SPADEGeneratorUnit(nn.Module):
         spade_eps: float = 1e-5,
         custom_padding: nn.Module = lambda x, pdi: F.pad(x, pdi, "reflect"),
     ):
-        super(SPADEGeneratorUnit, self).__init__()
+        super().__init__()
         # Padding
         self.padding = custom_padding
         self.padding_instruction = [
